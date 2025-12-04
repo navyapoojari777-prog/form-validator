@@ -1,7 +1,7 @@
 // Regex patterns
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone:/^\+91\d{10}$/,
+  phone:/^\+91[\d{10}]$/,
   password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
