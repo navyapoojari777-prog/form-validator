@@ -1,67 +1,40 @@
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\+91\s[6-9]\d{4}-\d{5}$/, // +91 99560-39990
+  phone: /^\+91\s[6-9]\d{4}-\d{5}$/,
   password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
-// Apply real-time + submit validation
-["email", "phone", "password"].forEach(id => {
+const fields = ["email", "phone", "password"];
+
+const form = document.getElementById("myForm");
+
+fields.forEach(id => {
   const input = document.getElementById(id);
-  
+
+  // Phone formatting
   if (id === "phone") {
-    // Auto-format phone number while typing
-    input.addEventListener("input", formatPhone);
+    input.addEventListener("input", e => {
+      let v = e.target.value.replace(/\D/g, "").slice(0, 10);
+      e.target.value = "+91 " + v.slice(0,5) + (v.length>5 ? "-" + v.slice(5) : "");
+    });
+    input.addEventListener("blur", () => {
+      let v = input.value.replace(/\D/g, "");
+      if(v.length === 10) input.value = "+91 " + v.slice(0,5) + "-" + v.slice(5);
+    });
   }
-  
+
+  // Real-time validation
   input.addEventListener("input", () => validate(id));
 });
-
-// Format phone number to +91 XXXXX-XXXXX
-function formatPhone(e) {
-  let value = e.target.value.replace(/\D/g, ""); // remove non-digits
-  if (value.startsWith("91")) value = value.slice(2); // remove leading 91 if typed
-  if (value.length > 10) value = value.slice(0, 10); // limit to 10 digits
-
-  let formatted = "+91 ";
-  if (value.length <= 5) {
-    formatted += value;
-  } else {
-    formatted += value.slice(0, 5) + "-" + value.slice(5);
-  }
-
-  e.target.value = formatted;
-}
 
 function validate(id) {
   const input = document.getElementById(id);
   const group = document.getElementById(id + "Group");
-  const errorMsg = group.querySelector(".error-msg");
-  const isValid = patterns[id].test(input.value.trim());
-
-  group.classList.toggle("success", isValid);
-  group.classList.toggle("error", !isValid);
-  errorMsg.style.display = isValid ? "none" : "block";
-
-  return isValid;
+  const ok = patterns[id].test(input.value.trim());
+  group.classList.toggle("success", ok);
+  group.classList.toggle("error", !ok);
+  group.querySelector(".error-msg").style.display = ok ? "none" : "block";
+  return ok;
 }
 
-// Submit
-document.getElementById("myForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const validForm = ["email", "phone", "password"].every(validate);
-
-  if (validForm) {
-    alert("Form Submitted Successfully!");
-    
-    this.reset();
-    document.querySelectorAll('.input-group').forEach(group => {
-      group.classList.remove('success', 'error');
-      group.querySelector('.error-msg').style.display = 'none';
-    });
-  } else {
-    const firstInvalid = ["email","phone","password"].find(id => !validate(id));
-    document.getElementById(firstInvalid).focus();
-    alert("Fix errors before submitting");
-  }
-});
+form.addEventListener
