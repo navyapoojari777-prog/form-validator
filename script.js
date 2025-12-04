@@ -1,54 +1,54 @@
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\d{10}$/,
- password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
+  phone: /^\d{10}$/,  // EXACT 10 digits only
+  password: /^(?=.*[A-Z])(?=.*\d).{8,}$/ 
 };
 
-// Apply real-time + submit validation
+// Attach real-time validation
 ["email", "phone", "password"].forEach(id => {
   const input = document.getElementById(id);
-  
-  if (id === "phone") {
-    // Auto-format phone number while typing
-    input.addEventListener("input", formatPhone);
-  }
-  
-  input.addEventListener("input", () => validate(id));
+  input.addEventListener("input", () => validateField(id));
 });
 
-// Format phone number to +91 XXXXX-XXXXX
-function formatPhone(e) {
-  let value = e.target.value.replace(/\D/g, ""); // remove non-digits
-  if (value.startsWith("91")) value = value.slice(2); // remove leading 91 if typed
-  if (value.length > 10) value = value.slice(0, 10); // limit to 10 digits
-
-  let formatted = "+91 ";
-  if (value.length <= 5) {
-    formatted += value;
-  } else {
-    formatted += value.slice(0, 5) + "-" + value.slice(5);
-  }
-
-  e.target.value = formatted;
-}
-
-function validate(id) {
+// Validate single field
+function validateField(id) {
   const input = document.getElementById(id);
   const group = document.getElementById(id + "Group");
-  if (validForm) {
+  const error = group.querySelector(".error-msg");
+
+  const isValid = patterns[id].test(input.value);
+
+  if (isValid) {
+    group.classList.add("success");
+    group.classList.remove("error");
+    error.style.display = "none";
+  } else {
+    group.classList.add("error");
+    group.classList.remove("success");
+    error.style.display = "block";
+  }
+
+  return isValid;
+}
+
+// Handle the form submit
+document.getElementById("myForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const validEmail = validateField("email");
+  const validPhone = validateField("phone");
+  const validPassword = validateField("password");
+
+  if (validEmail && validPhone && validPassword) {
     alert("Form Submitted Successfully!");
 
-    // Reset form fields
     this.reset();
 
-    // Remove success/error classes
-    document.querySelectorAll('.input-group').forEach(group => {
-      group.classList.remove('success', 'error');
-      group.querySelector('.error-msg').style.display = 'none';
+    document.querySelectorAll(".input-group").forEach(group => {
+      group.classList.remove("success", "error");
+      group.querySelector(".error-msg").style.display = "none";
     });
   } else {
-    const firstInvalid = ["email","phone","password"].find(id => !validate(id));
-    document.getElementById(firstInvalid).focus();
-    alert("Fix errors before submitting");
+    alert("Fix errors before submitting.");
   }
-};
+});
