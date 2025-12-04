@@ -1,6 +1,6 @@
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^[0-9]\d{10}$/,
+  phone: /^\d{10}$/,
  password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
