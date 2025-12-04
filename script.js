@@ -1,20 +1,24 @@
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\+91\s[6-9]\d{4}-\d{5}$/, 
+  phone: /^\+91\s\d{5}-\d{5}$/, // +91 98765-76543, any first digit 0-9
   password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
 const fields = ["email", "phone", "password"];
 const form = document.getElementById("myForm");
 
-// Format phone number to +91 XXXXX-XXXXX
+// Format phone number as +91 XXXXX-XXXXX
 function formatPhone(input) {
-  let v = input.value.replace(/\D/g, "").slice(0, 10); // only digits
-  if (v.length > 0) {
-    input.value = "+91 " + v.slice(0,5) + (v.length > 5 ? "-" + v.slice(5) : "");
-  } else {
+  let digits = input.value.replace(/\D/g, "").slice(0, 10); // max 10 digits
+
+  if(digits.length === 0) {
     input.value = "";
+    return;
   }
+
+  let formatted = "+91 " + digits.slice(0,5);
+  if(digits.length > 5) formatted += "-" + digits.slice(5);
+  input.value = formatted;
 }
 
 fields.forEach(id => {
@@ -48,4 +52,12 @@ form.addEventListener("submit", e => {
     alert("Form Submitted Successfully!");
     form.reset();
     document.querySelectorAll(".input-group").forEach(g => {
-      g.classList.remove
+      g.classList.remove("success", "error");
+      g.querySelector(".error-msg").style.display = "none";
+    });
+  } else {
+    const firstInvalid = fields.find(id => !validate(id));
+    document.getElementById(firstInvalid).focus();
+    alert("Fix errors before submitting");
+  }
+});
