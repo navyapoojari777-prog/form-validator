@@ -9,31 +9,37 @@ const form = document.getElementById("myForm");
 
 // Format phone number as +91 XXXXX-XXXXX
 function formatPhone(input) {
-  let digits = input.value.replace(/\D/g, "").slice(0, 10); // max 10 digits
+  // Remove all non-digits
+  let digits = input.value.replace(/\D/g, "");
 
+  // Remove leading '0' or '91' if present
+  if(digits.length > 10) digits = digits.slice(-10);
+
+  // If no digits, clear
   if(digits.length === 0) {
     input.value = "";
     return;
   }
 
+  // Format as +91 XXXXX-XXXXX
   let formatted = "+91 " + digits.slice(0,5);
   if(digits.length > 5) formatted += "-" + digits.slice(5);
   input.value = formatted;
 }
 
+// Add listeners for all fields
 fields.forEach(id => {
   const input = document.getElementById(id);
 
-  // Phone formatting
-  if (id === "phone") {
+  if(id === "phone") {
     input.addEventListener("input", () => formatPhone(input));
     input.addEventListener("blur", () => formatPhone(input));
   }
 
-  // Real-time validation
   input.addEventListener("input", () => validate(id));
 });
 
+// Validate input
 function validate(id) {
   const input = document.getElementById(id);
   const group = document.getElementById(id + "Group");
@@ -44,6 +50,7 @@ function validate(id) {
   return ok;
 }
 
+// Form submission
 form.addEventListener("submit", e => {
   e.preventDefault();
   const valid = fields.every(validate);
