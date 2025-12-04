@@ -30,5 +30,19 @@ document.getElementById("myForm").addEventListener("submit", function (e) {
 
   const validForm = ["email", "phone", "password"].every(validate);
 
-  alert(validForm ? "Form Submitted Successfully!" : "Fix errors before submitting");
+  if (validForm) {
+    alert("Form Submitted Successfully!");
+    
+    // Reset form fields
+    this.reset();
+
+    // Remove success/error classes
+    document.querySelectorAll('.input-group').forEach(group => {
+      group.classList.remove('success', 'error');
+      group.querySelector('.error-msg').style.display = 'none';
+    });
+  } else {
+    alert("Fix errors before submitting");
+  }
 });
+
