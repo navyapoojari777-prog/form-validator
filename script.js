@@ -1,16 +1,19 @@
+// Restrict phone to 10 digits only
+document.getElementById("phone").addEventListener("input", function () {
+  this.value = this.value.replace(/\D/g, "").slice(0, 10);
+});
+
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\d{10}$/,  // EXACT 10 digits only
-  password: /^(?=.*[A-Z])(?=.*\d).{8,}$/ 
+  phone: /^\d{10}$/,
+  password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
-// Attach real-time validation
 ["email", "phone", "password"].forEach(id => {
   const input = document.getElementById(id);
   input.addEventListener("input", () => validateField(id));
 });
 
-// Validate single field
 function validateField(id) {
   const input = document.getElementById(id);
   const group = document.getElementById(id + "Group");
@@ -31,8 +34,7 @@ function validateField(id) {
   return isValid;
 }
 
-// Handle the form submit
-document.getElementById("myForm").addEventListener("submit", function(e) {
+document.getElementById("myForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const validEmail = validateField("email");
@@ -41,7 +43,6 @@ document.getElementById("myForm").addEventListener("submit", function(e) {
 
   if (validEmail && validPhone && validPassword) {
     alert("Form Submitted Successfully!");
-
     this.reset();
 
     document.querySelectorAll(".input-group").forEach(group => {
