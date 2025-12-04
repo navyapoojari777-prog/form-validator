@@ -1,6 +1,6 @@
 const patterns = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  phone: /^\+91\s\d{5}-\d{5}$/, // +91 98765-76543, any first digit 0-9
+  phone: /^\+91[\s\d{5}-\d{5}]$/, // exactly +91 XXXXX-XXXXX
   password: /^(?=.*[A-Z])(?=.*\d).{8,}$/
 };
 
@@ -9,25 +9,32 @@ const form = document.getElementById("myForm");
 
 // Format phone number as +91 XXXXX-XXXXX
 function formatPhone(input) {
-  // Remove all non-digits
+  // Remove all non-digit characters
   let digits = input.value.replace(/\D/g, "");
 
-  // Remove leading '0' or '91' if present
+  // Keep only last 10 digits
   if(digits.length > 10) digits = digits.slice(-10);
 
-  // If no digits, clear
-  if(digits.length === 0) {
-    input.value = "";
-    return;
-  }
-
-  // Format as +91 XXXXX-XXXXX
-  let formatted = "+91 " + digits.slice(0,5);
+  // Format
+  let formatted = "+91 ";
+  if(digits.length > 0) formatted += digits.slice(0,5);
   if(digits.length > 5) formatted += "-" + digits.slice(5);
+
   input.value = formatted;
 }
 
-// Add listeners for all fields
+// Validate input and show errors
+function validate(id) {
+  const input = document.getElementById(id);
+  const group = document.getElementById(id + "Group");
+  const ok = patterns[id].test(input.value.trim());
+  group.classList.toggle("success", ok);
+  group.classList.toggle("error", !ok);
+  group.querySelector(".error-msg").style.display = ok ? "none" : "block";
+  return ok;
+}
+
+// Add listeners
 fields.forEach(id => {
   const input = document.getElementById(id);
 
@@ -39,18 +46,7 @@ fields.forEach(id => {
   input.addEventListener("input", () => validate(id));
 });
 
-// Validate input
-function validate(id) {
-  const input = document.getElementById(id);
-  const group = document.getElementById(id + "Group");
-  const ok = patterns[id].test(input.value.trim());
-  group.classList.toggle("success", ok);
-  group.classList.toggle("error", !ok);
-  group.querySelector(".error-msg").style.display = ok ? "none" : "block";
-  return ok;
-}
-
-// Form submission
+// Form submit
 form.addEventListener("submit", e => {
   e.preventDefault();
   const valid = fields.every(validate);
@@ -59,8 +55,8 @@ form.addEventListener("submit", e => {
     alert("Form Submitted Successfully!");
     form.reset();
     document.querySelectorAll(".input-group").forEach(g => {
-      g.classList.remove("success", "error");
-      g.querySelector(".error-msg").style.display = "none";
+      g.classList.remove("success","error");
+      g.querySelector(".error-msg").style.display="none";
     });
   } else {
     const firstInvalid = fields.find(id => !validate(id));
